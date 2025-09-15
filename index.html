@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Form Pendaftaran</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light only; }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .bg-gradient { background: radial-gradient(1200px 600px at 80% -10%, rgba(59,130,246,.20), transparent 60%), linear-gradient(180deg, #0f172a 0%, #0b1224 100%); }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+    .input { background:#0f1a33; border:1px solid rgba(255,255,255,0.12); }
+    .input:focus { outline: none; border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(59,130,246,0.25); }
+    .badge { background: linear-gradient(90deg,#22c55e,#16a34a); }
+    .btn { background: linear-gradient(135deg,#3b82f6,#2563eb); }
+    .btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .shadow-soft { box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    .required::after { content:" *"; color:#f87171; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient text-slate-100">
+  <div class="max-w-6xl mx-auto px-5 py-10">
+    <header class="mb-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full badge text-white text-sm font-semibold shadow-soft">
+        Pendaftaran Dibuka
+        <span class="inline-block w-2 h-2 rounded-full bg-white/90 animate-pulse"></span>
+      </div>
+      <h1 class="mt-5 text-3xl md:text-5xl font-extrabold tracking-tight">Form Pendaftaran</h1>
+      <p class="mt-3 text-slate-300 max-w-2xl">Isi data Anda dengan benar. Setelah dikirim, data akan tercatat ke Google Sheets Anda melalui penghubung aman (Google Apps Script).</p>
+    </header>
+
+    <main class="grid md:grid-cols-5 gap-6 items-start">
+      <!-- Form -->
+      <section class="md:col-span-3 glass rounded-2xl p-6 md:p-8 shadow-soft">
+        <form id="formPendaftaran" class="space-y-5">
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold required">Nama Lengkap</label>
+              <input type="text" name="nama" class="input w-full mt-2 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400" placeholder="Nama sesuai KTP" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold required">Email</label>
+              <input type="email" name="email" class="input w-full mt-2 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400" placeholder="nama@email.com" required>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold">Nomor Telepon</label>
+              <input type="tel" name="telepon" class="input w-full mt-2 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400" placeholder="08xxxxxxxxxx" pattern="^[0-9+ ]{8,20}$" inputmode="tel">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold required">Program</label>
+              <select name="program" class="input w-full mt-2 rounded-xl px-4 py-3 text-slate-100" required>
+                <option value="" disabled selected>Pilih program...</option>
+                <option>Web Design</option>
+                <option>Data Analyst</option>
+                <option>Digital Marketing</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold">Catatan</label>
+            <textarea name="catatan" rows="4" class="input w-full mt-2 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-400" placeholder="Tuliskan kebutuhan khusus atau pertanyaan Anda..."></textarea>
+          </div>
+
+          <!-- Consent -->
+          <div class="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+            <input id="setuju" type="checkbox" class="mt-1" required>
+            <label for="setuju" class="text-sm leading-relaxed">Saya menyetujui syarat & ketentuan serta kebijakan privasi.</label>
+          </div>
+
+          <!-- Status & Actions -->
+          <div class="flex items-center justify-between gap-4 pt-2">
+            <div id="status" class="text-sm text-slate-300"></div>
+            <div class="flex gap-3">
+              <button type="button" id="btnReset" class="px-5 py-3 rounded-xl bg-slate-700/50 hover:bg-slate-600/60 transition-colors">Reset</button>
+              <button type="submit" id="btnSubmit" class="btn px-6 py-3 rounded-xl font-semibold shadow-soft text-white transition-all">Kirim Pendaftaran</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Sidebar Info -->
+      <aside class="md:col-span-2 space-y-6">
+        <div class="glass rounded-2xl p-6 md:p-7 shadow-soft">
+          <h3 class="text-xl font-bold mb-3">Kenapa data aman?</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-300">
+            <li>Data dikirim ke endpoint Anda (Web App) yang dibuat dengan akun Google Anda.</li>
+            <li>Tidak ada penyimpanan pihak ketiga.</li>
+            <li>Anda bisa menonaktifkan/ubah akses kapan saja.</li>
+          </ul>
+        </div>
+        <div class="glass rounded-2xl p-6 md:p-7 shadow-soft">
+          <h3 class="text-xl font-bold mb-3">Cara melihat hasil</h3>
+          <ol class="list-decimal pl-5 space-y-2 text-slate-300">
+            <li>Buka Google Sheet yang sudah dikaitkan.</li>
+            <li>Data baru akan muncul di baris berikutnya setiap kali formulir dikirim.</li>
+          </ol>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="mt-10 text-center text-slate-400 text-sm">
+      Demo Form Pendaftaran • Hubungkan ke Google Sheets dengan URL Web App Anda
+    </footer>
+  </div>
+
+  <script>
+    // Ganti ini setelah Anda deploy Web App di Google Apps Script
+    const WEB_APP_URL = "PASTE_WEB_APP_URL_DI_SINI";
+
+    const form = document.getElementById('formPendaftaran');
+    const statusEl = document.getElementById('status');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnReset = document.getElementById('btnReset');
+
+    function setStatus(msg, type = 'info') {
+      statusEl.textContent = msg;
+      statusEl.className = 'text-sm ' + (type === 'error' ? 'text-red-300' : type === 'success' ? 'text-green-300' : 'text-slate-300');
+    }
+
+    function disableForm(disabled) {
+      [...form.elements].forEach(el => el.disabled = disabled);
+      btnSubmit.textContent = disabled ? 'Mengirim...' : 'Kirim Pendaftaran';
+    }
+
+    btnReset.addEventListener('click', () => {
+      form.reset();
+      setStatus('Formulir sudah direset.', 'info');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('', 'info');
+
+      if (!WEB_APP_URL || WEB_APP_URL.includes('PASTE_WEB_APP_URL_DI_SINI')) {
+        setStatus('Belum ada URL Web App. Kirimkan URL-nya agar saya hubungkan.', 'error');
+        return;
+      }
+
+      const formData = new FormData(form);
+      const payload = {
+        nama: (formData.get('nama') || '').trim(),
+        email: (formData.get('email') || '').trim(),
+        telepon: (formData.get('telepon') || '').trim(),
+        program: (formData.get('program') || '').trim(),
+        catatan: (formData.get('catatan') || '').trim(),
+      };
+
+      // Validasi ringan di sisi pengguna
+      if (!payload.nama || !payload.email || !payload.program) {
+        setStatus('Lengkapi kolom wajib bertanda *', 'error');
+        return;
+      }
+
+      disableForm(true);
+      setStatus('Mengirim data...');
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data && data.success) {
+          setStatus('Berhasil! Data Anda telah tercatat.', 'success');
+          form.reset();
+        } else {
+          const msg = (data && data.error) ? data.error : 'Gagal menyimpan. Coba lagi atau cek Web App.';
+          setStatus(msg, 'error');
+        }
+      } catch (err) {
+        setStatus('Tidak dapat terhubung. Periksa koneksi atau URL Web App.', 'error');
+      } finally {
+        disableForm(false);
+      }
+    });
+  </script>
+  <!-- Cloudflare challenge script (remove if not needed) -->
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f4adbf90eba5cf',t:'MTc1NzkwMzE4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
